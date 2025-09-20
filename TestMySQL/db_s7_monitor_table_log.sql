@@ -19,6 +19,8 @@
 -- Table structure for table `table_log`
 --
 
+CREATE DATABASE db_s7_monitor CHARACTER SET utf8 COLLATE utf8_general_ci;
+USE db_s7_monitor;
 DROP TABLE IF EXISTS `table_log`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
@@ -30,7 +32,7 @@ CREATE TABLE `table_log` (
   `ProductCode` text NOT NULL,
   `Description` text NOT NULL,
   PRIMARY KEY (`ID`)
-) ENGINE=InnoDB AUTO_INCREMENT=24 DEFAULT CHARSET=utf8mb3;
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb3;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 

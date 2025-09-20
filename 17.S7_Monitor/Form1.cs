@@ -11,6 +11,8 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using TestReadDataBlock;
 using TestMySQL;
+using System.Threading;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 
 namespace _17.S7_Monitor
 {
@@ -38,6 +40,8 @@ namespace _17.S7_Monitor
         private bool NoProductNameOrCode;
 
         public MySQL db;
+        private Task pollingTask;
+        private CancellationTokenSource pollingCts;
 
         private async void Form1_Load(object sender, EventArgs e)
         {
@@ -51,7 +55,7 @@ namespace _17.S7_Monitor
 
             db = new MySQL("localhost", "db_s7_monitor", "root", "11111111");
 
-            return;
+            //return;
 
             Console.WriteLine("Connect PLC...");
             Console.WriteLine($"PLC IP: {PLC_IP}, RACK: {PLC_RACK}, SLOT: {PLC_SLOT}");
@@ -66,8 +70,22 @@ namespace _17.S7_Monitor
                     bt_alarm.Enabled = true;
                     bt_running.Enabled = true;
 
-                    Console.WriteLine("Start reading data block...");
-                    tm_read.Enabled = true;
+                    //Console.WriteLine("Start reading data block...");
+                    //tm_read.Enabled = true;
+
+                    pollingCts = new CancellationTokenSource();
+                    pollingTask = StartPollingAsync(pollingCts.Token);
+
+                    // Stop Polling
+                    //cts.Cancel();
+                    //try
+                    //{
+                    //    await pollingTask; // Wait for the task to finish.
+                    //}
+                    //catch (OperationCanceledException)
+                    //{
+                    //    Console.WriteLine("Polling Has been cancelled.");
+                    //}
 
                     Console.WriteLine("Set NoProductNameOrCode to true...");
                     SystemRunning = plc.ReadBit(MapDataBlock.SystemRunning);
@@ -85,6 +103,10 @@ namespace _17.S7_Monitor
                     plc.WriteBit(MapDataBlock.NoProductNameOrCode, true);
                     NoProductNameOrCode = true;
                     Console.WriteLine("NoProductNameOrCode set to true");
+
+                    Console.WriteLine("Clear Product Name and Product Code...");
+                    plc.WriteString(1, MapDataBlock.ProductName, 200, "");
+                    plc.WriteString(1, MapDataBlock.ProductCode, 200, "");
                 }
                 else
                 {
@@ -107,12 +129,24 @@ namespace _17.S7_Monitor
         private void tm_read_Tick(object sender, EventArgs e)
         {
             tm_read.Enabled = false;
-            ReadDataBlock();
-            DisplayStatus();
-            tm_read.Enabled = true;
+            //ReadDataBlock();
+            //DisplayStatus();
+            //tm_read.Enabled = true;
+        }
+        private async Task StartPollingAsync(CancellationToken token)
+        {
+            while (true)
+            {
+                token.ThrowIfCancellationRequested(); // Check if it has been canceled
+
+                ReadDataBlock();
+                DisplayStatus();
+
+                await Task.Delay(1000, token);
+            }
         }
 
-        private async void ReadDataBlock()
+        private void ReadDataBlock()
         {
             bool SystemRunning = false;
             bool visionControllerFailure = false;
@@ -123,16 +157,18 @@ namespace _17.S7_Monitor
 
             using (DataBlock plc = new DataBlock(PLC_IP, PLC_RACK, PLC_SLOT))
             {
-                if (await plc.ConnectAsync())
+                if (plc.Connect())
                 {
                     SystemRunning = plc.ReadBit(MapDataBlock.SystemRunning);
                     if (SystemRunning)
                     {
-                        bt_running.BackColor = Color.Lime;
+                        //bt_running.BackColor = Color.Lime;
+                        bt_running.Invoke((Action)(() => bt_running.BackColor = Color.Lime));
                     }
                     else
                     {
-                        bt_running.BackColor = Color.Red;
+                        //bt_running.BackColor = Color.Red;
+                        bt_running.Invoke((Action)(() => bt_running.BackColor = Color.Red));
                     }
 
                     visionControllerFailure = plc.ReadBit(MapDataBlock.visionControllerFailure);
@@ -168,13 +204,17 @@ namespace _17.S7_Monitor
                         }
 
                         message = message.Trim().TrimEnd(',');
-                        lb_message.Text = message;
-                        lb_message.BackColor = Color.Red;
+                        //lb_message.Text = message;
+                        //lb_message.BackColor = Color.Red;
+                        lb_message.Invoke((Action)(() => lb_message.Text = message));
+                        lb_message.Invoke((Action)(() => lb_message.BackColor = Color.Red));
                     }
                     else
                     {
-                        lb_message.Text = "System Normal";
-                        lb_message.BackColor = Color.DodgerBlue;
+                        //lb_message.Text = "System Normal";
+                        //lb_message.BackColor = Color.DodgerBlue;
+                        lb_message.Invoke((Action)(() => lb_message.Text = "System Normal"));
+                        lb_message.Invoke((Action)(() => lb_message.BackColor = Color.DodgerBlue));
                     }
 
                     if (SteelDefectDetected)
@@ -187,7 +227,8 @@ namespace _17.S7_Monitor
                 else
                 {
                     Console.WriteLine("Connection failed");
-                    bt_running.BackColor = Color.Red;
+                    //bt_running.BackColor = Color.Red;
+                    bt_running.Invoke((Action)(() => bt_running.BackColor = Color.Red));
                 }
             }
 
@@ -248,7 +289,8 @@ namespace _17.S7_Monitor
             status += $"Acknowledge = {Acknowledge}\r\n";
             status += $"No Product Name Or Code = {NoProductNameOrCode}\r\n";
 
-            lb_flag.Text = status;
+            //lb_flag.Text = status;
+            lb_flag.Invoke((Action)(() => lb_flag.Text = status));
         }
 
         private void bt_alarm_Click(object sender, EventArgs e)
@@ -336,11 +378,14 @@ namespace _17.S7_Monitor
             string formattedDate = today.ToString("dd/MM/yyyy", CultureInfo.InvariantCulture);
             string formattedTime = now.ToString("HH:mm");
 
-            dgv_home.Rows.Add(formattedDate, formattedTime, tb_productName.Text, tb_productCode.Text, description);
+            //dgv_home.Rows.Add(formattedDate, formattedTime, tb_productName.Text, tb_productCode.Text, description);
+            dgv_home.Invoke((Action)(() => dgv_home.Rows.Add(formattedDate, formattedTime, 
+                tb_productName.Text, tb_productCode.Text, description)));
 
             if (dgv_home.Rows.Count > 8)
             {
-                dgv_home.Rows.RemoveAt(0);
+                //dgv_home.Rows.RemoveAt(0);
+                dgv_home.Invoke((Action)(() => dgv_home.Rows.RemoveAt(0)));
             }
 
             //database insert

@@ -1,0 +1,16 @@
+D:\Server Svn\Freelance\17.S7_Monitor\TestSQLite\bin\Debug\TestSQLite.exe.config
+D:\Server Svn\Freelance\17.S7_Monitor\TestSQLite\bin\Debug\TestSQLite.exe
+D:\Server Svn\Freelance\17.S7_Monitor\TestSQLite\bin\Debug\TestSQLite.pdb
+D:\Server Svn\Freelance\17.S7_Monitor\TestSQLite\bin\Debug\System.Data.SQLite.dll
+D:\Server Svn\Freelance\17.S7_Monitor\TestSQLite\obj\Debug\TestSQLite.csproj.AssemblyReference.cache
+D:\Server Svn\Freelance\17.S7_Monitor\TestSQLite\obj\Debug\TestSQLite.csproj.CoreCompileInputs.cache
+D:\Server Svn\Freelance\17.S7_Monitor\TestSQLite\obj\Debug\TestSQLite.csproj.Up2Date
+D:\Server Svn\Freelance\17.S7_Monitor\TestSQLite\obj\Debug\TestSQLite.exe
+D:\Server Svn\Freelance\17.S7_Monitor\TestSQLite\obj\Debug\TestSQLite.pdb
+D:\Server Svn\Freelance\17.S7_Monitor\TestSQLite\bin\Debug\EntityFramework.dll
+D:\Server Svn\Freelance\17.S7_Monitor\TestSQLite\bin\Debug\EntityFramework.SqlServer.dll
+D:\Server Svn\Freelance\17.S7_Monitor\TestSQLite\bin\Debug\System.Data.SQLite.EF6.dll
+D:\Server Svn\Freelance\17.S7_Monitor\TestSQLite\bin\Debug\System.Data.SQLite.Linq.dll
+D:\Server Svn\Freelance\17.S7_Monitor\TestSQLite\bin\Debug\EntityFramework.xml
+D:\Server Svn\Freelance\17.S7_Monitor\TestSQLite\bin\Debug\EntityFramework.SqlServer.xml
+D:\Server Svn\Freelance\17.S7_Monitor\TestSQLite\bin\Debug\System.Data.SQLite.xml

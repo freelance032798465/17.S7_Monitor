@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestReadDataBlock", "TestRe
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestSQLite", "TestSQLite\TestSQLite.csproj", "{19D28D6C-B576-4C21-A198-04C8E45410E2}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestMySQL", "TestMySQL\TestMySQL.csproj", "{77E8FF47-9988-4F41-BA09-4AF4E02D4E57}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{19D28D6C-B576-4C21-A198-04C8E45410E2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{19D28D6C-B576-4C21-A198-04C8E45410E2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{19D28D6C-B576-4C21-A198-04C8E45410E2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{77E8FF47-9988-4F41-BA09-4AF4E02D4E57}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{77E8FF47-9988-4F41-BA09-4AF4E02D4E57}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{77E8FF47-9988-4F41-BA09-4AF4E02D4E57}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{77E8FF47-9988-4F41-BA09-4AF4E02D4E57}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

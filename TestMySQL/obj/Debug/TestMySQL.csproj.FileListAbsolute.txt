@@ -1,0 +1,13 @@
+D:\Server Svn\Freelance\17.S7_Monitor\TestMySQL\bin\Debug\TestMySQL.exe.config
+D:\Server Svn\Freelance\17.S7_Monitor\TestMySQL\bin\Debug\TestMySQL.exe
+D:\Server Svn\Freelance\17.S7_Monitor\TestMySQL\bin\Debug\TestMySQL.pdb
+D:\Server Svn\Freelance\17.S7_Monitor\TestMySQL\bin\Debug\System.Memory.dll
+D:\Server Svn\Freelance\17.S7_Monitor\TestMySQL\bin\Debug\System.Threading.Tasks.Extensions.dll
+D:\Server Svn\Freelance\17.S7_Monitor\TestMySQL\bin\Debug\System.Numerics.Vectors.dll
+D:\Server Svn\Freelance\17.S7_Monitor\TestMySQL\bin\Debug\System.Buffers.dll
+D:\Server Svn\Freelance\17.S7_Monitor\TestMySQL\bin\Debug\MySql.Data.xml
+D:\Server Svn\Freelance\17.S7_Monitor\TestMySQL\obj\Debug\TestMySQL.csproj.AssemblyReference.cache
+D:\Server Svn\Freelance\17.S7_Monitor\TestMySQL\obj\Debug\TestMySQL.csproj.CoreCompileInputs.cache
+D:\Server Svn\Freelance\17.S7_Monitor\TestMySQL\obj\Debug\TestMySQL.csproj.Up2Date
+D:\Server Svn\Freelance\17.S7_Monitor\TestMySQL\obj\Debug\TestMySQL.exe
+D:\Server Svn\Freelance\17.S7_Monitor\TestMySQL\obj\Debug\TestMySQL.pdb

@@ -10,6 +10,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using TestReadDataBlock;
+using TestMySQL;
 
 namespace _17.S7_Monitor
 {
@@ -36,7 +37,7 @@ namespace _17.S7_Monitor
         private bool Acknowledge;
         private bool NoProductNameOrCode;
 
-        private byte DB1_B0;
+        public MySQL db;
 
         private async void Form1_Load(object sender, EventArgs e)
         {
@@ -47,6 +48,10 @@ namespace _17.S7_Monitor
             PLC_IP = FormPLC.ReadIP();
             PLC_RACK = FormPLC.ReadRACK();
             PLC_SLOT = FormPLC.ReadSLOT();
+
+            db = new MySQL("localhost", "db_s7_monitor", "root", "11111111");
+
+            return;
 
             Console.WriteLine("Connect PLC...");
             Console.WriteLine($"PLC IP: {PLC_IP}, RACK: {PLC_RACK}, SLOT: {PLC_SLOT}");
@@ -128,7 +133,6 @@ namespace _17.S7_Monitor
                     else
                     {
                         bt_running.BackColor = Color.Red;
-                        return;
                     }
 
                     visionControllerFailure = plc.ReadBit(MapDataBlock.visionControllerFailure);
@@ -288,8 +292,6 @@ namespace _17.S7_Monitor
                             plc.WriteBit(MapDataBlock.NoProductNameOrCode, false);
                             NoProductNameOrCode = false;
                             Console.WriteLine("NoProductNameOrCode set to false");
-
-                            StampData("System Start");
                         }
                     }
                     else
@@ -317,8 +319,6 @@ namespace _17.S7_Monitor
                             plc.WriteBit(MapDataBlock.NoProductNameOrCode, false);
                             NoProductNameOrCode = false;
                             Console.WriteLine("NoProductNameOrCode set to false");
-
-                            StampData("System Start");
                         }
                     }
                     else
@@ -344,6 +344,15 @@ namespace _17.S7_Monitor
             }
 
             //database insert
+            var newLog = new TableLog
+            {
+                Date = new DateTime(today.Year, today.Month, today.Day),
+                Time = now.TimeOfDay,
+                ProductName = tb_productName.Text,
+                ProductCode = tb_productCode.Text,
+                Description = description
+            };
+            db.InsertLog(newLog);
         }
     }
 }

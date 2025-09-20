@@ -81,6 +81,30 @@
     <Compile Include="FormData.Designer.cs">
       <DependentUpon>FormData.cs</DependentUpon>
     </Compile>
+    <Compile Include="FormFilter.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FormFilter.Designer.cs">
+      <DependentUpon>FormFilter.cs</DependentUpon>
+    </Compile>
+    <Compile Include="FormFilterDateTime.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FormFilterDateTime.Designer.cs">
+      <DependentUpon>FormFilterDateTime.cs</DependentUpon>
+    </Compile>
+    <Compile Include="FormFilterTime.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FormFilterTime.Designer.cs">
+      <DependentUpon>FormFilterTime.cs</DependentUpon>
+    </Compile>
+    <Compile Include="FormFilterDate.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FormFilterDate.Designer.cs">
+      <DependentUpon>FormFilterDate.cs</DependentUpon>
+    </Compile>
     <Compile Include="FormPLC_Comunication.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -101,6 +125,18 @@
     </EmbeddedResource>
     <EmbeddedResource Include="FormData.resx">
       <DependentUpon>FormData.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FormFilter.resx">
+      <DependentUpon>FormFilter.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FormFilterDateTime.resx">
+      <DependentUpon>FormFilterDateTime.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FormFilterTime.resx">
+      <DependentUpon>FormFilterTime.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FormFilterDate.resx">
+      <DependentUpon>FormFilterDate.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="FormPLC_Comunication.resx">
       <DependentUpon>FormPLC_Comunication.cs</DependentUpon>
@@ -132,6 +168,10 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\TestMySQL\TestMySQL.csproj">
+      <Project>{77e8ff47-9988-4f41-ba09-4af4e02d4e57}</Project>
+      <Name>TestMySQL</Name>
+    </ProjectReference>
     <ProjectReference Include="..\TestReadDataBlock\TestReadDataBlock.csproj">
       <Project>{1c39a29d-f22d-4c48-8656-84d782eee795}</Project>
       <Name>TestReadDataBlock</Name>

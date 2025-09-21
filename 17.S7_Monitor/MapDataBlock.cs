@@ -17,8 +17,10 @@ namespace _17.S7_Monitor
         public static string NoProductNameOrCode = "DB1.DBX0.6";
         public static string SensorTriggerFailure = "DB1.DBX0.7";
 
+        public static string TimeStamp = "DB1.DBX1.0";
+        public static string SwitchOn = "DB1.DBX1.1";
+
         public static string ProductName = "2";
         public static string ProductCode = "258";
-        public static string TimeStamp = "514";
     }
 }

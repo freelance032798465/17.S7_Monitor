@@ -13,6 +13,8 @@ using TestReadDataBlock;
 using TestMySQL;
 using System.Threading;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement;
+using System.Diagnostics;
+using System.Security.Claims;
 
 namespace _17.S7_Monitor
 {
@@ -35,13 +37,16 @@ namespace _17.S7_Monitor
         private bool AirPresssurePumpFailure;
         private bool SensorTriggerFailure;
         private bool SteelDefectDetected;
+        private bool SwitchOn;
 
-        private bool Acknowledge;
         private bool NoProductNameOrCode;
+        private bool blink;
 
         public MySQL db;
         private Task pollingTask;
         private CancellationTokenSource pollingCts;
+        private Task timeStampTask;
+        private CancellationTokenSource timeStampCts;
 
         private async void Form1_Load(object sender, EventArgs e)
         {
@@ -70,22 +75,13 @@ namespace _17.S7_Monitor
                     bt_alarm.Enabled = true;
                     bt_running.Enabled = true;
 
-                    //Console.WriteLine("Start reading data block...");
-                    //tm_read.Enabled = true;
-
+                    Console.WriteLine("Start polling...");
                     pollingCts = new CancellationTokenSource();
                     pollingTask = StartPollingAsync(pollingCts.Token);
 
-                    // Stop Polling
-                    //cts.Cancel();
-                    //try
-                    //{
-                    //    await pollingTask; // Wait for the task to finish.
-                    //}
-                    //catch (OperationCanceledException)
-                    //{
-                    //    Console.WriteLine("Polling Has been cancelled.");
-                    //}
+                    Console.WriteLine("Start timestamp checking...");
+                    timeStampCts = new CancellationTokenSource();
+                    timeStampTask = CheckTimeStampAsync(timeStampCts.Token);
 
                     Console.WriteLine("Set NoProductNameOrCode to true...");
                     SystemRunning = plc.ReadBit(MapDataBlock.SystemRunning);
@@ -96,7 +92,7 @@ namespace _17.S7_Monitor
                     }
                     else
                     {
-                        bt_running.BackColor = Color.Red;
+                        bt_running.BackColor = Color.Gray;
                         Console.WriteLine("System is not running");
                     }
 
@@ -125,14 +121,6 @@ namespace _17.S7_Monitor
         {
             FormPLC.ShowDialog();
         }
-
-        private void tm_read_Tick(object sender, EventArgs e)
-        {
-            tm_read.Enabled = false;
-            //ReadDataBlock();
-            //DisplayStatus();
-            //tm_read.Enabled = true;
-        }
         private async Task StartPollingAsync(CancellationToken token)
         {
             while (true)
@@ -145,6 +133,46 @@ namespace _17.S7_Monitor
                 await Task.Delay(1000, token);
             }
         }
+        private async Task CheckTimeStampAsync(CancellationToken token)
+        {
+            bool SteelDefectDetected = false;
+            bool timeStampSup = false;
+
+            while (true)
+            {
+                token.ThrowIfCancellationRequested(); // Check if it has been canceled
+
+                using (DataBlock plc = new DataBlock(PLC_IP, PLC_RACK, PLC_SLOT))
+                {
+                    if (plc.Connect())
+                    {
+                        bool timeStamp = plc.ReadBit(MapDataBlock.TimeStamp);
+
+                        if (timeStamp != timeStampSup)
+                        {
+                            timeStampSup = timeStamp;
+
+                            if (timeStamp)
+                            {
+                                SteelDefectDetected = plc.ReadBit(MapDataBlock.SteelDefectDetected);
+                                this.SteelDefectDetected = SteelDefectDetected;
+
+                                if (SteelDefectDetected)
+                                {
+                                    StampData("Steel defect detected (NG)");
+                                }
+                                else
+                                {
+                                    StampData("Good");
+                                }
+                            }
+                        }
+                    }
+                }
+
+                await Task.Delay(100, token);
+            }
+        }
 
         private void ReadDataBlock()
         {
@@ -153,83 +181,52 @@ namespace _17.S7_Monitor
             bool PLCFailure = false;
             bool AirPresssurePumpFailure = false;
             bool SensorTriggerFailure = false;
-            bool SteelDefectDetected = false;
+            bool SwitchOn = false;
 
             using (DataBlock plc = new DataBlock(PLC_IP, PLC_RACK, PLC_SLOT))
             {
                 if (plc.Connect())
                 {
+                    bt_config.Invoke((Action)(() => bt_config.BackColor = Color.DodgerBlue));
+
                     SystemRunning = plc.ReadBit(MapDataBlock.SystemRunning);
                     if (SystemRunning)
                     {
-                        //bt_running.BackColor = Color.Lime;
+                        bt_running.Invoke((Action)(() => bt_running.Text = "SYSTEM \r\nRUNNING"));
                         bt_running.Invoke((Action)(() => bt_running.BackColor = Color.Lime));
                     }
                     else
                     {
-                        //bt_running.BackColor = Color.Red;
-                        bt_running.Invoke((Action)(() => bt_running.BackColor = Color.Red));
+                        bt_running.Invoke((Action)(() => bt_running.Text = "SYSTEM \r\nSTOP"));
+                        bt_running.Invoke((Action)(() => bt_running.BackColor = Color.Gray));
                     }
+                    Console.WriteLine($"SystemRunning: {SystemRunning}");
 
                     visionControllerFailure = plc.ReadBit(MapDataBlock.visionControllerFailure);
                     PLCFailure = plc.ReadBit(MapDataBlock.PLCFailure);
                     AirPresssurePumpFailure = plc.ReadBit(MapDataBlock.AirPresssurePumpFailure);
                     SensorTriggerFailure = plc.ReadBit(MapDataBlock.SensorTriggerFailure);
+                    SwitchOn = plc.ReadBit(MapDataBlock.SwitchOn);
 
-                    SteelDefectDetected = plc.ReadBit(MapDataBlock.SteelDefectDetected);
-
-                    if (visionControllerFailure || PLCFailure || AirPresssurePumpFailure ||
-                        SensorTriggerFailure || SteelDefectDetected)
-                    {
-                        string message = "";
-                        if (visionControllerFailure)
-                        {
-                            message += "-Vision Controller Failure, ";
-                        }
-                        if (PLCFailure)
-                        {
-                            message += "-PLC Failure, ";
-                        }
-                        if (AirPresssurePumpFailure)
-                        {
-                            message += "-Air Pressure Pump Failure, ";
-                        }
-                        if (SensorTriggerFailure)
-                        {
-                            message += "-Sensor Trigger Failure, ";
-                        }
-                        if (SteelDefectDetected)
-                        {
-                            message += "-Steel defect detected (NG), ";
-                        }
-
-                        message = message.Trim().TrimEnd(',');
-                        //lb_message.Text = message;
-                        //lb_message.BackColor = Color.Red;
-                        lb_message.Invoke((Action)(() => lb_message.Text = message));
-                        lb_message.Invoke((Action)(() => lb_message.BackColor = Color.Red));
-                    }
-                    else
-                    {
-                        //lb_message.Text = "System Normal";
-                        //lb_message.BackColor = Color.DodgerBlue;
-                        lb_message.Invoke((Action)(() => lb_message.Text = "System Normal"));
-                        lb_message.Invoke((Action)(() => lb_message.BackColor = Color.DodgerBlue));
-                    }
-
-                    if (SteelDefectDetected)
-                    {
-                        PopupAlarm PopupAlarm = new PopupAlarm(this);
-                        PopupAlarm.AlarmMessage = "Steel defect detected (NG)";
-                        PopupAlarm.ShowDialog();
-                    }
+                    Console.WriteLine($"visionControllerFailure: {visionControllerFailure}");
+                    Console.WriteLine($"PLCFailure: {PLCFailure}");
+                    Console.WriteLine($"AirPresssurePumpFailure: {AirPresssurePumpFailure}");
+                    Console.WriteLine($"SensorTriggerFailure: {SensorTriggerFailure}");
+                    Console.WriteLine($"SwitchOn: {SwitchOn}");
                 }
                 else
                 {
                     Console.WriteLine("Connection failed");
-                    //bt_running.BackColor = Color.Red;
-                    bt_running.Invoke((Action)(() => bt_running.BackColor = Color.Red));
+                    bt_config.Invoke((Action)(() => bt_config.BackColor = Color.Red));
+                    return;
                 }
+            }
+
+            bool Alarm(string text) {
+                lb_message.Invoke((Action)(() => lb_message.Text = text));
+                blink = true;
+                tm_blink.Enabled = true;
+                return true;
             }
 
             bool change = false;
@@ -242,39 +239,53 @@ namespace _17.S7_Monitor
             if (this.visionControllerFailure != visionControllerFailure)
             {
                 this.visionControllerFailure = visionControllerFailure;
-                if (visionControllerFailure) StampData("Vision Controller Failure");
+                if (visionControllerFailure)
+                {
+                    StampData("Vision Controller Failure");
+                    Alarm("Vision Controller Failure");
+                }
                 change = true;
             }
             if (this.PLCFailure != PLCFailure)
             {
                 this.PLCFailure = PLCFailure;
-                if (PLCFailure) StampData("PLC Failure");
+                if (PLCFailure)
+                {
+                    StampData("PLC Failure");
+                    Alarm("PLC Failure");
+                }
                 change = true;
             }
             if (this.AirPresssurePumpFailure != AirPresssurePumpFailure)
             {
                 this.AirPresssurePumpFailure = AirPresssurePumpFailure;
-                if (AirPresssurePumpFailure) StampData("Air Pressure Pump Failure");
+                if (AirPresssurePumpFailure)
+                {
+                    StampData("Air Pressure Pump Failure");
+                    Alarm("Air Pressure Pump Failure");
+                }
                 change = true;
             }
             if (this.SensorTriggerFailure != SensorTriggerFailure)
             {
                 this.SensorTriggerFailure = SensorTriggerFailure;
-                if (SensorTriggerFailure) StampData("Sensor Trigger Failure");
-                change = true;
-            }
-            if (this.SteelDefectDetected != SteelDefectDetected)
-            {
-                this.SteelDefectDetected = SteelDefectDetected;
-                if (SteelDefectDetected) StampData("Steel defect detected (NG)");
-                change = true;
-            }
-            if (change)
-            {
-                if (SystemRunning && !visionControllerFailure && !PLCFailure && 
-                    !AirPresssurePumpFailure && !SensorTriggerFailure && !SteelDefectDetected)
+                if (SensorTriggerFailure)
                 {
-                    StampData("Good");
+                    StampData("Sensor Trigger Failure");
+                    Alarm("Sensor Trigger Failure");
+                }
+                change = true;
+            }
+            if (this.SwitchOn != SwitchOn)
+            {
+                this.SwitchOn = SwitchOn;
+
+                if (!SwitchOn)
+                {
+                    this.visionControllerFailure = false;
+                    this.PLCFailure = false;
+                    this.AirPresssurePumpFailure = false;
+                    this.SensorTriggerFailure = false;
                 }
             }
         }
@@ -286,8 +297,8 @@ namespace _17.S7_Monitor
             status += $"Air Presssure Pump = {AirPresssurePumpFailure}\r\n";
             status += $"Sensor Trigger = {SensorTriggerFailure}\r\n";
             status += $"Steel Defect Detected = {SteelDefectDetected}\r\n";
-            status += $"Acknowledge = {Acknowledge}\r\n";
             status += $"No Product Name Or Code = {NoProductNameOrCode}\r\n";
+            status += $"Switch On = {SwitchOn}\r\n";
 
             //lb_flag.Text = status;
             lb_flag.Invoke((Action)(() => lb_flag.Text = status));
@@ -305,8 +316,11 @@ namespace _17.S7_Monitor
                 if (plc.Connect())
                 {
                     plc.WriteBit(MapDataBlock.Acknowledge, true);
-                    Acknowledge = true;
+                    DelaymS(500);
+                    plc.WriteBit(MapDataBlock.Acknowledge, false);
                     Console.WriteLine("Alarm acknowledged");
+
+                    blink = false;
                     return true;
                 }
                 else
@@ -315,6 +329,17 @@ namespace _17.S7_Monitor
                 }
             }
             return false;
+        }
+        public static void DelaymS(int mS)
+        {
+            Stopwatch stopwatchDelaymS = new Stopwatch();
+            stopwatchDelaymS.Restart();
+            while (mS > stopwatchDelaymS.ElapsedMilliseconds)
+            {
+                if (!stopwatchDelaymS.IsRunning) stopwatchDelaymS.Start();
+                Application.DoEvents();
+            }
+            stopwatchDelaymS.Stop();
         }
         private async void tb_productName_KeyDown(object sender, KeyEventArgs e)
         {
@@ -379,10 +404,10 @@ namespace _17.S7_Monitor
             string formattedTime = now.ToString("HH:mm");
 
             //dgv_home.Rows.Add(formattedDate, formattedTime, tb_productName.Text, tb_productCode.Text, description);
-            dgv_home.Invoke((Action)(() => dgv_home.Rows.Add(formattedDate, formattedTime, 
+            dgv_home.Invoke((Action)(() => dgv_home.Rows.Add(formattedDate, formattedTime,
                 tb_productName.Text, tb_productCode.Text, description)));
 
-            if (dgv_home.Rows.Count > 8)
+            if (dgv_home.Rows.Count > 30)
             {
                 //dgv_home.Rows.RemoveAt(0);
                 dgv_home.Invoke((Action)(() => dgv_home.Rows.RemoveAt(0)));
@@ -398,6 +423,51 @@ namespace _17.S7_Monitor
                 Description = description
             };
             db.InsertLog(newLog);
+        }
+
+        private async void Form1_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            // Stop Polling
+            pollingCts.Cancel();
+            try
+            {
+                await pollingTask; // Wait for the task to finish.
+            }
+            catch (OperationCanceledException)
+            {
+                Console.WriteLine("Polling Has been cancelled.");
+            }
+
+            timeStampCts.Cancel();
+            try
+            {
+                await timeStampTask; // Wait for the task to finish.
+            }
+            catch (OperationCanceledException)
+            {
+                Console.WriteLine("timeStamp Has been cancelled.");
+            }
+        }
+
+        private void tm_blink_Tick(object sender, EventArgs e)
+        {
+            if (blink)
+            {
+                if (lb_message.BackColor == Color.Red)
+                {
+                    lb_message.BackColor = Color.DodgerBlue;
+                }
+                else
+                {
+                    lb_message.BackColor = Color.Red;
+                }
+            }
+            else
+            {
+                lb_message.Invoke((Action)(() => lb_message.Text = "System Normal"));
+                lb_message.Invoke((Action)(() => lb_message.BackColor = Color.DodgerBlue));
+                tm_blink.Enabled = false;
+            }   
         }
     }
 }

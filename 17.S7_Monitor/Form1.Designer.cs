@@ -52,7 +52,7 @@
             this.Description = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.dataGridView2 = new System.Windows.Forms.DataGridView();
             this.Column1 = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.tm_read = new System.Windows.Forms.Timer(this.components);
+            this.tm_blink = new System.Windows.Forms.Timer(this.components);
             this.lb_flag = new System.Windows.Forms.Label();
             this.panel1.SuspendLayout();
             this.panel2.SuspendLayout();
@@ -105,7 +105,7 @@
             // 
             // bt_running
             // 
-            this.bt_running.BackColor = System.Drawing.Color.DodgerBlue;
+            this.bt_running.BackColor = System.Drawing.Color.Gray;
             this.bt_running.Cursor = System.Windows.Forms.Cursors.Default;
             this.bt_running.Enabled = false;
             this.bt_running.Font = new System.Drawing.Font("Microsoft Sans Serif", 20.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(222)));
@@ -302,10 +302,10 @@
             this.Column1.HeaderText = "HOT DEFECT DETECTION DATA LOG";
             this.Column1.Name = "Column1";
             // 
-            // tm_read
+            // tm_blink
             // 
-            this.tm_read.Interval = 1000;
-            this.tm_read.Tick += new System.EventHandler(this.tm_read_Tick);
+            this.tm_blink.Interval = 500;
+            this.tm_blink.Tick += new System.EventHandler(this.tm_blink_Tick);
             // 
             // lb_flag
             // 
@@ -345,6 +345,7 @@
             this.Name = "Form1";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "SYS : HOT DEFECT DETECTION SYSTEM";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Form1_FormClosing);
             this.Load += new System.EventHandler(this.Form1_Load);
             this.panel1.ResumeLayout(false);
             this.panel1.PerformLayout();
@@ -378,7 +379,7 @@
         private System.Windows.Forms.DataGridViewTextBoxColumn ProductName;
         private System.Windows.Forms.DataGridViewTextBoxColumn ProductCode;
         private System.Windows.Forms.DataGridViewTextBoxColumn Description;
-        private System.Windows.Forms.Timer tm_read;
+        private System.Windows.Forms.Timer tm_blink;
         private System.Windows.Forms.Label lb_flag;
     }
 }

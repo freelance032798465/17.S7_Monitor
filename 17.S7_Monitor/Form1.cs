@@ -200,7 +200,7 @@ namespace _17.S7_Monitor
                         bt_running.Invoke((Action)(() => bt_running.Text = "SYSTEM \r\nSTOP"));
                         bt_running.Invoke((Action)(() => bt_running.BackColor = Color.Gray));
                     }
-                    Console.WriteLine($"SystemRunning: {SystemRunning}");
+                    //Console.WriteLine($"SystemRunning: {SystemRunning}");
 
                     visionControllerFailure = plc.ReadBit(MapDataBlock.visionControllerFailure);
                     PLCFailure = plc.ReadBit(MapDataBlock.PLCFailure);
@@ -208,11 +208,11 @@ namespace _17.S7_Monitor
                     SensorTriggerFailure = plc.ReadBit(MapDataBlock.SensorTriggerFailure);
                     SwitchOn = plc.ReadBit(MapDataBlock.SwitchOn);
 
-                    Console.WriteLine($"visionControllerFailure: {visionControllerFailure}");
-                    Console.WriteLine($"PLCFailure: {PLCFailure}");
-                    Console.WriteLine($"AirPresssurePumpFailure: {AirPresssurePumpFailure}");
-                    Console.WriteLine($"SensorTriggerFailure: {SensorTriggerFailure}");
-                    Console.WriteLine($"SwitchOn: {SwitchOn}");
+                    //Console.WriteLine($"visionControllerFailure: {visionControllerFailure}");
+                    //Console.WriteLine($"PLCFailure: {PLCFailure}");
+                    //Console.WriteLine($"AirPresssurePumpFailure: {AirPresssurePumpFailure}");
+                    //Console.WriteLine($"SensorTriggerFailure: {SensorTriggerFailure}");
+                    //Console.WriteLine($"SwitchOn: {SwitchOn}");
                 }
                 else
                 {
@@ -406,6 +406,9 @@ namespace _17.S7_Monitor
             //dgv_home.Rows.Add(formattedDate, formattedTime, tb_productName.Text, tb_productCode.Text, description);
             dgv_home.Invoke((Action)(() => dgv_home.Rows.Add(formattedDate, formattedTime,
                 tb_productName.Text, tb_productCode.Text, description)));
+            
+            // Scroll to the last row
+            dgv_home.Invoke((Action)(() => dgv_home.FirstDisplayedScrollingRowIndex = dgv_home.RowCount - 1));
 
             if (dgv_home.Rows.Count > 30)
             {

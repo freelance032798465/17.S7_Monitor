@@ -1,0 +1,16 @@
+D:\Server Svn\Freelance\17.S7_Monitor\TestSQLite\bin\Release\TestSQLite.exe.config
+D:\Server Svn\Freelance\17.S7_Monitor\TestSQLite\bin\Release\TestSQLite.exe
+D:\Server Svn\Freelance\17.S7_Monitor\TestSQLite\bin\Release\TestSQLite.pdb
+D:\Server Svn\Freelance\17.S7_Monitor\TestSQLite\bin\Release\EntityFramework.dll
+D:\Server Svn\Freelance\17.S7_Monitor\TestSQLite\bin\Release\EntityFramework.SqlServer.dll
+D:\Server Svn\Freelance\17.S7_Monitor\TestSQLite\bin\Release\System.Data.SQLite.dll
+D:\Server Svn\Freelance\17.S7_Monitor\TestSQLite\bin\Release\System.Data.SQLite.EF6.dll
+D:\Server Svn\Freelance\17.S7_Monitor\TestSQLite\bin\Release\System.Data.SQLite.Linq.dll
+D:\Server Svn\Freelance\17.S7_Monitor\TestSQLite\bin\Release\EntityFramework.xml
+D:\Server Svn\Freelance\17.S7_Monitor\TestSQLite\bin\Release\EntityFramework.SqlServer.xml
+D:\Server Svn\Freelance\17.S7_Monitor\TestSQLite\bin\Release\System.Data.SQLite.xml
+D:\Server Svn\Freelance\17.S7_Monitor\TestSQLite\obj\Release\TestSQLite.csproj.AssemblyReference.cache
+D:\Server Svn\Freelance\17.S7_Monitor\TestSQLite\obj\Release\TestSQLite.csproj.CoreCompileInputs.cache
+D:\Server Svn\Freelance\17.S7_Monitor\TestSQLite\obj\Release\TestSQLite.csproj.Up2Date
+D:\Server Svn\Freelance\17.S7_Monitor\TestSQLite\obj\Release\TestSQLite.exe
+D:\Server Svn\Freelance\17.S7_Monitor\TestSQLite\obj\Release\TestSQLite.pdb

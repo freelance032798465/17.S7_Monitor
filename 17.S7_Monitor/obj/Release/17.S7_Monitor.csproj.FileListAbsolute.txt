@@ -39,3 +39,4 @@ D:\Server Svn\Freelance\17.S7_Monitor\17.S7_Monitor\obj\Release\17.S7_Monitor.cs
 D:\Server Svn\Freelance\17.S7_Monitor\17.S7_Monitor\obj\Release\17.S7_Mo.5BC3FC45.Up2Date
 D:\Server Svn\Freelance\17.S7_Monitor\17.S7_Monitor\obj\Release\17.S7_Monitor.exe
 D:\Server Svn\Freelance\17.S7_Monitor\17.S7_Monitor\obj\Release\17.S7_Monitor.pdb
+D:\Server Svn\Freelance\17.S7_Monitor\17.S7_Monitor\bin\Release\System.Runtime.CompilerServices.Unsafe.dll

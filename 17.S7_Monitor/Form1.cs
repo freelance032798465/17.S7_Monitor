@@ -12,7 +12,6 @@ using System.Windows.Forms;
 using TestReadDataBlock;
 using TestMySQL;
 using System.Threading;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 using System.Diagnostics;
 using System.Security.Claims;
 
@@ -25,12 +24,16 @@ namespace _17.S7_Monitor
             InitializeComponent();
         }
 
+        // Forms
         public FormData FormData;
         public FormPLC_Comunication FormPLC;
+
+        // PLC Configuration
         public string PLC_IP;
         public short PLC_RACK;
         public short PLC_SLOT;
 
+        // PLC Data
         private bool SystemRunning;
         private bool visionControllerFailure;
         private bool PLCFailure;
@@ -39,15 +42,26 @@ namespace _17.S7_Monitor
         private bool SteelDefectDetected;
         private bool SwitchOn;
 
+        // Flags
         private bool NoProductNameOrCode;
         private bool blink;
 
+        // Database
         public MySQL db;
+
+        // Polling Tasks
         private Task pollingTask;
         private CancellationTokenSource pollingCts;
         private Task timeStampTask;
         private CancellationTokenSource timeStampCts;
 
+        // MySQL Configuration
+        private string mySQL_server = "localhost";
+        private string mySQL_database = "db_s7_monitor";
+        private string mySQL_user = "root";
+        private string mySQL_password = "11111111";
+
+        // Form Load Event
         private async void Form1_Load(object sender, EventArgs e)
         {
             FormData = new FormData(this);
@@ -58,7 +72,8 @@ namespace _17.S7_Monitor
             PLC_RACK = FormPLC.ReadRACK();
             PLC_SLOT = FormPLC.ReadSLOT();
 
-            db = new MySQL("localhost", "db_s7_monitor", "root", "11111111");
+            Console.WriteLine("Connect to database...");
+            db = new MySQL(mySQL_server, mySQL_database, mySQL_user, mySQL_password);
 
             //return;
 
@@ -111,16 +126,22 @@ namespace _17.S7_Monitor
                 }
             }
         }
-
+        
+        // Button Click Events
         private void bt_history_Click(object sender, EventArgs e)
         {
             FormData.ShowDialog();
         }
-
         private void bt_config_Click(object sender, EventArgs e)
         {
             FormPLC.ShowDialog();
         }
+        private void bt_alarm_Click(object sender, EventArgs e)
+        {
+            SetAcknowledge();
+        }
+
+        // Polling and Data Handling
         private async Task StartPollingAsync(CancellationToken token)
         {
             while (true)
@@ -160,6 +181,7 @@ namespace _17.S7_Monitor
                                 if (SteelDefectDetected)
                                 {
                                     StampData("Steel defect detected (NG)");
+                                    AlarmBlink("Steel defect detected (NG)");
                                 }
                                 else
                                 {
@@ -174,6 +196,13 @@ namespace _17.S7_Monitor
             }
         }
 
+        // Alarm and Data Logging
+        private void AlarmBlink(string text)
+        {
+            lb_message.Invoke((Action)(() => lb_message.Text = text));
+            blink = true;
+            tm_blink.Enabled = true;
+        }
         private void ReadDataBlock()
         {
             bool SystemRunning = false;
@@ -222,13 +251,6 @@ namespace _17.S7_Monitor
                 }
             }
 
-            bool Alarm(string text) {
-                lb_message.Invoke((Action)(() => lb_message.Text = text));
-                blink = true;
-                tm_blink.Enabled = true;
-                return true;
-            }
-
             bool change = false;
             if (this.SystemRunning != SystemRunning)
             {
@@ -242,7 +264,7 @@ namespace _17.S7_Monitor
                 if (visionControllerFailure)
                 {
                     StampData("Vision Controller Failure");
-                    Alarm("Vision Controller Failure");
+                    AlarmBlink("Vision Controller Failure");
                 }
                 change = true;
             }
@@ -252,7 +274,7 @@ namespace _17.S7_Monitor
                 if (PLCFailure)
                 {
                     StampData("PLC Failure");
-                    Alarm("PLC Failure");
+                    AlarmBlink("PLC Failure");
                 }
                 change = true;
             }
@@ -262,7 +284,7 @@ namespace _17.S7_Monitor
                 if (AirPresssurePumpFailure)
                 {
                     StampData("Air Pressure Pump Failure");
-                    Alarm("Air Pressure Pump Failure");
+                    AlarmBlink("Air Pressure Pump Failure");
                 }
                 change = true;
             }
@@ -272,7 +294,7 @@ namespace _17.S7_Monitor
                 if (SensorTriggerFailure)
                 {
                     StampData("Sensor Trigger Failure");
-                    Alarm("Sensor Trigger Failure");
+                    AlarmBlink("Sensor Trigger Failure");
                 }
                 change = true;
             }
@@ -303,10 +325,31 @@ namespace _17.S7_Monitor
             //lb_flag.Text = status;
             lb_flag.Invoke((Action)(() => lb_flag.Text = status));
         }
-
-        private void bt_alarm_Click(object sender, EventArgs e)
+        private void StampData(string description)
         {
-            SetAcknowledge();
+            DateTime today = DateTime.Now;
+            DateTime now = DateTime.Now;
+            string formattedDate = today.ToString("dd/MM/yyyy", CultureInfo.InvariantCulture);
+            string formattedTime = now.ToString("HH:mm");
+
+            dgv_home.Invoke((Action)(() => dgv_home.Rows.Insert(0,
+                formattedDate, formattedTime, tb_productName.Text, tb_productCode.Text, description)));
+
+            if (dgv_home.Rows.Count > 30)
+            {
+                dgv_home.Invoke((Action)(() => dgv_home.Rows.RemoveAt(dgv_home.Rows.Count - 1)));
+            }
+
+            //database insert
+            var newLog = new TableLog
+            {
+                Date = new DateTime(today.Year, today.Month, today.Day),
+                Time = now.TimeOfDay,
+                ProductName = tb_productName.Text,
+                ProductCode = tb_productCode.Text,
+                Description = description
+            };
+            db.InsertLog(newLog);
         }
         public bool SetAcknowledge()
         {
@@ -330,6 +373,8 @@ namespace _17.S7_Monitor
             }
             return false;
         }
+
+        // Delay function without freezing UI
         public static void DelaymS(int mS)
         {
             Stopwatch stopwatchDelaymS = new Stopwatch();
@@ -341,6 +386,9 @@ namespace _17.S7_Monitor
             }
             stopwatchDelaymS.Stop();
         }
+
+
+        // TextBox Events
         private async void tb_productName_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.KeyCode == Keys.Enter)
@@ -396,38 +444,7 @@ namespace _17.S7_Monitor
             }
         }
 
-        private void StampData(string description)
-        {
-            DateTime today = DateTime.Now;
-            DateTime now = DateTime.Now;
-            string formattedDate = today.ToString("dd/MM/yyyy", CultureInfo.InvariantCulture);
-            string formattedTime = now.ToString("HH:mm");
-
-            //dgv_home.Rows.Add(formattedDate, formattedTime, tb_productName.Text, tb_productCode.Text, description);
-            dgv_home.Invoke((Action)(() => dgv_home.Rows.Add(formattedDate, formattedTime,
-                tb_productName.Text, tb_productCode.Text, description)));
-            
-            // Scroll to the last row
-            dgv_home.Invoke((Action)(() => dgv_home.FirstDisplayedScrollingRowIndex = dgv_home.RowCount - 1));
-
-            if (dgv_home.Rows.Count > 30)
-            {
-                //dgv_home.Rows.RemoveAt(0);
-                dgv_home.Invoke((Action)(() => dgv_home.Rows.RemoveAt(0)));
-            }
-
-            //database insert
-            var newLog = new TableLog
-            {
-                Date = new DateTime(today.Year, today.Month, today.Day),
-                Time = now.TimeOfDay,
-                ProductName = tb_productName.Text,
-                ProductCode = tb_productCode.Text,
-                Description = description
-            };
-            db.InsertLog(newLog);
-        }
-
+        // Form Closing Event
         private async void Form1_FormClosing(object sender, FormClosingEventArgs e)
         {
             // Stop Polling
@@ -452,6 +469,7 @@ namespace _17.S7_Monitor
             }
         }
 
+        // Blink Timer Event
         private void tm_blink_Tick(object sender, EventArgs e)
         {
             if (blink)
@@ -471,6 +489,38 @@ namespace _17.S7_Monitor
                 lb_message.Invoke((Action)(() => lb_message.BackColor = Color.DodgerBlue));
                 tm_blink.Enabled = false;
             }   
+        }
+
+        // Clear NoProductNameOrCode when user start typing
+        private async void tb_productName_TextChanged(object sender, EventArgs e)
+        {
+            if (string.IsNullOrEmpty(tb_productName.Text))
+            {
+                using (DataBlock plc = new DataBlock(PLC_IP, PLC_RACK, PLC_SLOT))
+                {
+                    if (await plc.ConnectAsync())
+                    {
+                        plc.WriteBit(MapDataBlock.NoProductNameOrCode, true);
+                        NoProductNameOrCode = true;
+                    }
+                }
+                        
+            }
+        }
+        private async void tb_productCode_TextChanged(object sender, EventArgs e)
+        {
+            if (string.IsNullOrEmpty(tb_productCode.Text))
+            {
+                using (DataBlock plc = new DataBlock(PLC_IP, PLC_RACK, PLC_SLOT))
+                {
+                    if (await plc.ConnectAsync())
+                    {
+                        plc.WriteBit(MapDataBlock.NoProductNameOrCode, true);
+                        NoProductNameOrCode = true;
+                    }
+                }
+
+            }
         }
     }
 }

@@ -40,7 +40,7 @@ namespace _17.S7_Monitor
         private bool AirPresssurePumpFailure;
         private bool SensorTriggerFailure;
         private bool SteelDefectDetected;
-        private bool SwitchOn;
+        private bool SwitchOn = true;
 
         // Flags
         private bool NoProductNameOrCode;
@@ -210,7 +210,7 @@ namespace _17.S7_Monitor
             bool PLCFailure = false;
             bool AirPresssurePumpFailure = false;
             bool SensorTriggerFailure = false;
-            bool SwitchOn = false;
+            bool SwitchOn = true;
 
             using (DataBlock plc = new DataBlock(PLC_IP, PLC_RACK, PLC_SLOT))
             {
@@ -302,7 +302,7 @@ namespace _17.S7_Monitor
             {
                 this.SwitchOn = SwitchOn;
 
-                if (!SwitchOn)
+                if (SwitchOn)
                 {
                     this.visionControllerFailure = false;
                     this.PLCFailure = false;

@@ -24,12 +24,10 @@ D:\Server Svn\Freelance\17.S7_Monitor\17.S7_Monitor\bin\Debug\S7.Net.dll
 D:\Server Svn\Freelance\17.S7_Monitor\17.S7_Monitor\bin\Debug\System.Memory.dll
 D:\Server Svn\Freelance\17.S7_Monitor\17.S7_Monitor\bin\Debug\System.Buffers.dll
 D:\Server Svn\Freelance\17.S7_Monitor\17.S7_Monitor\bin\Debug\System.Numerics.Vectors.dll
-D:\Server Svn\Freelance\17.S7_Monitor\17.S7_Monitor\bin\Debug\System.Runtime.CompilerServices.Unsafe.dll
 D:\Server Svn\Freelance\17.S7_Monitor\17.S7_Monitor\bin\Debug\TestReadDataBlock.pdb
 D:\Server Svn\Freelance\17.S7_Monitor\17.S7_Monitor\bin\Debug\TestReadDataBlock.exe.config
 D:\Server Svn\Freelance\17.S7_Monitor\17.S7_Monitor\bin\Debug\S7.Net.xml
 D:\Server Svn\Freelance\17.S7_Monitor\17.S7_Monitor\bin\Debug\System.Buffers.xml
-D:\Server Svn\Freelance\17.S7_Monitor\17.S7_Monitor\bin\Debug\System.Runtime.CompilerServices.Unsafe.xml
 D:\Server Svn\Freelance\17.S7_Monitor\17.S7_Monitor\obj\Debug\_17.S7_Monitor.PopupAlarm.resources
 D:\Server Svn\Freelance\17.S7_Monitor\17.S7_Monitor\bin\Debug\TestMySQL.exe
 D:\Server Svn\Freelance\17.S7_Monitor\17.S7_Monitor\bin\Debug\MySql.Data.dll

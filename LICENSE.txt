@@ -1,0 +1,11 @@
+Custom License for 17.S7_Monitor
+
+Copyright (c) 2025 Mr.Anocha Lhaoken
+All Rights Reserved.
+
+Permission is hereby granted to use this software for the purposes
+agreed upon in the project contract.  
+
+Any reproduction, redistribution, modification, sublicensing, or commercial use
+by any third party is strictly prohibited without prior written permission from
+the copyright holder.

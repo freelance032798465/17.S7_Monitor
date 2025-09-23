@@ -1,0 +1,10 @@
+Version 1.0.0 - 2025-09-20
+- First create project
+
+Version 1.0.1 - 2025-09-22
+- Show latest value at top of DataGridView
+- Fixed bug
+- Change state switch on
+
+Version 1.0.2 - 2025-09-23
+- After typing product, auto-update in 2 seconds

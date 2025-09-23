@@ -64,8 +64,14 @@ namespace _17.S7_Monitor
         // Form Load Event
         private async void Form1_Load(object sender, EventArgs e)
         {
+            // Initialize Forms
             FormData = new FormData(this);
             FormPLC = new FormPLC_Comunication(this);
+
+            // Initialize timer for debouncing textbox product name and code
+            debounceTimer = new System.Windows.Forms.Timer();
+            debounceTimer.Interval = 2000;
+            debounceTimer.Tick += DebounceTimer_Tick;
 
             Console.WriteLine("Load PLC configuration...");
             PLC_IP = FormPLC.ReadIP();
@@ -387,63 +393,6 @@ namespace _17.S7_Monitor
             stopwatchDelaymS.Stop();
         }
 
-
-        // TextBox Events
-        private async void tb_productName_KeyDown(object sender, KeyEventArgs e)
-        {
-            if (e.KeyCode == Keys.Enter)
-            {
-                e.SuppressKeyPress = true;
-                Console.WriteLine("Set Product Name...");
-                using (DataBlock plc = new DataBlock(PLC_IP, PLC_RACK, PLC_SLOT))
-                {
-                    if (await plc.ConnectAsync())
-                    {
-                        plc.WriteString(1, MapDataBlock.ProductName, 200, tb_productName.Text);
-                        Console.WriteLine($"Product Name set to: {tb_productName.Text}");
-
-                        if (!string.IsNullOrEmpty(tb_productCode.Text))
-                        {
-                            plc.WriteBit(MapDataBlock.NoProductNameOrCode, false);
-                            NoProductNameOrCode = false;
-                            Console.WriteLine("NoProductNameOrCode set to false");
-                        }
-                    }
-                    else
-                    {
-                        Console.WriteLine("Connection failed");
-                    }
-                }
-            }
-        }
-        private async void tb_productCode_KeyDown(object sender, KeyEventArgs e)
-        {
-            if (e.KeyCode == Keys.Enter)
-            {
-                e.SuppressKeyPress = true;
-                Console.WriteLine("Set Product Name...");
-                using (DataBlock plc = new DataBlock(PLC_IP, PLC_RACK, PLC_SLOT))
-                {
-                    if (await plc.ConnectAsync())
-                    {
-                        plc.WriteString(1, MapDataBlock.ProductCode, 200, tb_productCode.Text);
-                        Console.WriteLine($"Product Name set to: {tb_productCode.Text}");
-
-                        if (!string.IsNullOrEmpty(tb_productName.Text))
-                        {
-                            plc.WriteBit(MapDataBlock.NoProductNameOrCode, false);
-                            NoProductNameOrCode = false;
-                            Console.WriteLine("NoProductNameOrCode set to false");
-                        }
-                    }
-                    else
-                    {
-                        Console.WriteLine("Connection failed");
-                    }
-                }
-            }
-        }
-
         // Form Closing Event
         private async void Form1_FormClosing(object sender, FormClosingEventArgs e)
         {
@@ -492,34 +441,48 @@ namespace _17.S7_Monitor
         }
 
         // Clear NoProductNameOrCode when user start typing
-        private async void tb_productName_TextChanged(object sender, EventArgs e)
+        private void tb_productName_TextChanged(object sender, EventArgs e)
         {
-            if (string.IsNullOrEmpty(tb_productName.Text))
-            {
-                using (DataBlock plc = new DataBlock(PLC_IP, PLC_RACK, PLC_SLOT))
-                {
-                    if (await plc.ConnectAsync())
-                    {
-                        plc.WriteBit(MapDataBlock.NoProductNameOrCode, true);
-                        NoProductNameOrCode = true;
-                    }
-                }
-                        
-            }
+            debounceTimer.Stop();
+            debounceTimer.Start();
         }
-        private async void tb_productCode_TextChanged(object sender, EventArgs e)
+        private void tb_productCode_TextChanged(object sender, EventArgs e)
         {
-            if (string.IsNullOrEmpty(tb_productCode.Text))
+            debounceTimer.Stop();
+            debounceTimer.Start();
+        }
+        private System.Windows.Forms.Timer debounceTimer;
+        private void DebounceTimer_Tick(object sender, EventArgs e)
+        {
+            debounceTimer.Stop();
+
+            using (DataBlock plc = new DataBlock(PLC_IP, PLC_RACK, PLC_SLOT))
             {
-                using (DataBlock plc = new DataBlock(PLC_IP, PLC_RACK, PLC_SLOT))
+                if (plc.Connect())
                 {
-                    if (await plc.ConnectAsync())
+                    plc.WriteString(1, MapDataBlock.ProductName, 200, tb_productName.Text);
+                    Console.WriteLine($"Product Name set to: {tb_productName.Text}");
+
+                    plc.WriteString(1, MapDataBlock.ProductCode, 200, tb_productCode.Text);
+                    Console.WriteLine($"Product Code set to: {tb_productCode.Text}");
+
+                    if (string.IsNullOrEmpty(tb_productName.Text) || string.IsNullOrEmpty(tb_productCode.Text))
                     {
                         plc.WriteBit(MapDataBlock.NoProductNameOrCode, true);
                         NoProductNameOrCode = true;
+                        Console.WriteLine("NoProductNameOrCode set to true");
+                    }
+                    else
+                    {
+                        plc.WriteBit(MapDataBlock.NoProductNameOrCode, false);
+                        NoProductNameOrCode = false;
+                        Console.WriteLine("NoProductNameOrCode set to false");
                     }
                 }
-
+                else
+                {
+                    Console.WriteLine("Connection failed");
+                }
             }
         }
     }

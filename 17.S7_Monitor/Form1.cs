@@ -314,6 +314,11 @@ namespace _17.S7_Monitor
                     this.PLCFailure = false;
                     this.AirPresssurePumpFailure = false;
                     this.SensorTriggerFailure = false;
+
+                    if (NoProductNameOrCode)
+                    {
+                        AlarmBlink("No Product Name Or Code");
+                    }
                 }
             }
         }
